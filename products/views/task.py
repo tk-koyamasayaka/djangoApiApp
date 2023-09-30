@@ -4,6 +4,9 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.http import Http404
 
 # Create your views here.
 # リクエストを受け取り、適切なレスポンスを生成する役割
@@ -20,46 +23,49 @@ REST フレームワークには、API ビューの作成に使用できる 2 �
 """
 
 
-@api_view(['GET', 'POST'])
-def task_list(request, format=None):
+class TaskList(APIView):
     """
-    List all conde Tasks, or create or new task.
+    List all tasks, or create anew task
     """
-    if request.method == 'GET':
+
+    def get(self, request, format=None):
         tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
 
-    elif request.method == 'POST':
+    def post(self, request, format=None):
         data = JSONParser().parse(request)
         serializer = TaskSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST', 'DELETE'])
-def task_detail(request, pk, format=None):
+class TaskDetail(APIView):
     """
     Retrieve, update or delete a code snippet.
     """
-    try:
-        task = Task.objects.get(pk=pk)
-    except Task.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == "GET":
+    def get_object(self, pk):
+        try:
+            return Task.objects.get(pk=pk)
+        except Task.DoesNotExist:
+            return Http404
+
+    def get(self, request, pk, format=None):
+        serializer = TaskSerializer(self.get_object(pk))
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        task = self.get_object(pk)
         serializer = TaskSerializer(task)
-        return JsonResponse(serializer.data)
-
-    elif request.method == "PUT":
-        data = JSONParser().parse(request)
-        serializer = TaskSerializer(task, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == "DELETE":
+    def delete(self, request, pk, format=None):
+        task = self.get_object(pk)
         task.delete()
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
