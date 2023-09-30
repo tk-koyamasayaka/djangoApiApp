@@ -1,9 +1,12 @@
 from products.serializer.task import TaskSerializer
 from products.models.tasks import Task
-from django.http import HttpResponse, JsonResponse
 from rest_framework.parsers import JSONParser
-from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.http import Http404
+from rest_framework import mixins
+from rest_framework import generics
 
 # Create your views here.
 # リクエストを受け取り、適切なレスポンスを生成する役割
@@ -20,46 +23,11 @@ REST フレームワークには、API ビューの作成に使用できる 2 �
 """
 
 
-@api_view(['GET', 'POST'])
-def task_list(request, format=None):
-    """
-    List all conde Tasks, or create or new task.
-    """
-    if request.method == 'GET':
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = TaskSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TaskList(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
 
 
-@api_view(['GET', 'POST', 'DELETE'])
-def task_detail(request, pk, format=None):
-    """
-    Retrieve, update or delete a code snippet.
-    """
-    try:
-        task = Task.objects.get(pk=pk)
-    except Task.DoesNotExist:
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = TaskSerializer(task)
-        return JsonResponse(serializer.data)
-
-    elif request.method == "PUT":
-        data = JSONParser().parse(request)
-        serializer = TaskSerializer(task, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-
-    elif request.method == "DELETE":
-        task.delete()
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
