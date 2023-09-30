@@ -1,11 +1,5 @@
 from products.serializer.task import TaskSerializer
 from products.models.tasks import Task
-from rest_framework.parsers import JSONParser
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.http import Http404
-from rest_framework import mixins
 from rest_framework import generics
 
 # Create your views here.
