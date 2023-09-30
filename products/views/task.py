@@ -21,7 +21,7 @@ REST フレームワークには、API ビューの作成に使用できる 2 �
 
 
 @api_view(['GET', 'POST'])
-def task_list(request):
+def task_list(request, format=None):
     """
     List all conde Tasks, or create or new task.
     """
@@ -40,7 +40,7 @@ def task_list(request):
 
 
 @api_view(['GET', 'POST', 'DELETE'])
-def task_detail(request, pk):
+def task_detail(request, pk, format=None):
     """
     Retrieve, update or delete a code snippet.
     """
