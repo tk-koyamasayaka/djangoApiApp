@@ -23,34 +23,11 @@ REST フレームワークには、API ビューの作成に使用できる 2 �
 """
 
 
-class TaskList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    """
-    List all tasks, or create anew task
-    """
-
+class TaskList(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-
-class TaskDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, generics.GenericAPIView):
-    """
-    Retrieve, update or delete a code snippet.
-    """
-
+class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request,  *args, **kwargs)
-
-    def put(self, request,  *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request,  *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
