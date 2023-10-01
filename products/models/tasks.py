@@ -8,12 +8,10 @@ class Task(models.Model):
     content = models.TextField(verbose_name="内容", blank=False, null=False, max_length=500)
     due_date = models.DateTimeField(verbose_name="期限日", null=True, blank=True)
     owner = models.ForeignKey('auth.User', related_name='tasks', on_delete=models.CASCADE)
-    highlighted = models.TextField(default="")
+    highlighted = models.TextField(default="", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        lexer = get_lexer_by_name(self.content)
-        formatter = HtmlFormatter(content=self.content)
-        self.highlighted = highlight(self.content, lexer, formatter)
+        self.highlighted = 'パワー'
         super().save(*args, **kwargs)
