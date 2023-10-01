@@ -3,9 +3,11 @@ from products.models.tasks import Task
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
         model = Task
-        fields = ['content', 'due_date']
+        fields = ['content', 'due_date', 'owner']
 
         """
         >>> from products.serializer.task import TaskSerializer

@@ -1,12 +1,6 @@
 from products.serializer.task import TaskSerializer
 from products.models.tasks import Task
-from rest_framework.parsers import JSONParser
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.http import Http404
-from rest_framework import mixins
-from rest_framework import generics
+from rest_framework import generics, permissions
 
 # Create your views here.
 # リクエストを受け取り、適切なレスポンスを生成する役割
@@ -27,7 +21,15 @@ class TaskList(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
+    """
+    REST フレームワークには、特定のビューにアクセスできるユーザーを制限するために使用できる多数の権限クラスが含まれている
+    今回はIsAuthenticatedOrReadOnlyを設定しており、これは認証されたリクエストは読み取り/書き込みアクセスが取得され、
+    認証されていないリクエストは読み取り専用アクセスが取得可能となる。
+    """
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
