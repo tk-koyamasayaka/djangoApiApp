@@ -1,12 +1,9 @@
 from products.serializer.task import TaskSerializer
 from products.models.tasks import Task
-from rest_framework.parsers import JSONParser
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.http import Http404
-from rest_framework import mixins
 from rest_framework import generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 # Create your views here.
 # リクエストを受け取り、適切なレスポンスを生成する役割
@@ -21,6 +18,14 @@ REST フレームワークには、API ビューの作成に使用できる 2 �
 ラッパーは、405 Method Not Allowed適切な場合に応答を返したり、
 不正な入力でParseErrorアクセスしたときに発生する例外を処理したりするなどの動作も提供する
 """
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'tasks': reverse('tasks-list', request=request, format=format)
+    })
 
 
 class TaskList(generics.ListCreateAPIView):
