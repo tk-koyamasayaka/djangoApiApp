@@ -13,5 +13,5 @@ class Task(models.Model):
     update_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.highlighted = 'パワー'
+        self.highlighted = 'なし'
         super().save(*args, **kwargs)
